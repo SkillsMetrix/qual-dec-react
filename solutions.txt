@@ -18,16 +18,19 @@ export default class LSP extends Component{
             <div>
                 Welcome to Product Order Screen
                 <hr/>
-<Order/>
+<Order quantity={this.state.quantity} oqc={this.quantityChanged}/>
 <hr/>
-<Address/>
+<Address address={this.props.address} ac= {this.addressChanged}/>
 <hr/>
-<Summary/>
+<Summary quantity={this.state.quantity} oqc={this.quantityChanged} address={this.state.address} />
             </div>
         )
     }
 }
 class Order extends Component{
+    changeQty =(e)=>{
+        this.props.oqc(e.target.value)
+    }
     render(){
         return(
             <div>
@@ -38,7 +41,7 @@ class Order extends Component{
                     <option>Product-3</option>
                 </select>
                 <p>Enter Quantity:
-                    <input type="text" />
+                    <input type="text"  value={this.props.quantity} onChange={this.changeQty}/>
                 </p>
             </div>
         )
@@ -46,13 +49,16 @@ class Order extends Component{
 }
 
 class Address extends Component{
+    changeAddr=(e)=>{
+        this.props.ac(e.target.value)
+    }
     render(){
         return(
             <div>
                 <p>Address Details </p>
               
                 <p>Enter Address:
-                    <input type="text" />
+                    <input type="text"  value={this.props.address} onChange={this.changeAddr}/>
                 </p>
             </div>
         )
@@ -60,6 +66,9 @@ class Address extends Component{
 }
 
 class Summary extends Component{
+     changeQty =(e)=>{
+        this.props.oqc(e.target.value)
+    }
     render(){
         return(
             <div>
@@ -67,9 +76,9 @@ class Summary extends Component{
                  <p>Product Name </p>
                 
                 <p>Update Quantity:
-                    <input type="text" />
+                    <input type="text" value={this.props.quantity} onChange={this.changeQty} />
                 </p>
-                <p>Address:</p>
+                <p>Address: {this.props.address}</p> 
             </div>
         )
     }
