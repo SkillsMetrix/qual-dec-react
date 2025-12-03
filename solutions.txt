@@ -1,85 +1,136 @@
 import { Component } from "react";
 
-
-export default class LSP extends Component{
-
-    state={
-        quantity:"",
-        address:""
+class CustomError extends Component {
+  state = {
+    hasError: null,
+  };
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      <div>
+        <p>Unable to Load Address...!</p>
+      </div>;
+    } else {
+      return this.props.children;
     }
-    addressChanged=(val) => {
-        this.setState({address:val})
-    }
-    quantityChanged=(val) => {
-        this.setState({quantity:val})
-    }
-    render(){
-        return (
-            <div>
-                Welcome to Product Order Screen
-                <hr/>
-<Order quantity={this.state.quantity} oqc={this.quantityChanged}/>
-<hr/>
-<Address address={this.props.address} ac= {this.addressChanged}/>
-<hr/>
-<Summary quantity={this.state.quantity} oqc={this.quantityChanged} address={this.state.address} />
-            </div>
-        )
-    }
-}
-class Order extends Component{
-    changeQty =(e)=>{
-        this.props.oqc(e.target.value)
-    }
-    render(){
-        return(
-            <div>
-                <p>Product Name</p>
-                <select>
-                    <option>Product-1</option>
-                    <option>Product-2</option>
-                    <option>Product-3</option>
-                </select>
-                <p>Enter Quantity:
-                    <input type="text"  value={this.props.quantity} onChange={this.changeQty}/>
-                </p>
-            </div>
-        )
-    }
+  }
 }
 
-class Address extends Component{
-    changeAddr=(e)=>{
-        this.props.ac(e.target.value)
-    }
-    render(){
-        return(
-            <div>
-                <p>Address Details </p>
-              
-                <p>Enter Address:
-                    <input type="text"  value={this.props.address} onChange={this.changeAddr}/>
-                </p>
-            </div>
-        )
-    }
+export default class LSP extends Component {
+  state = {
+    quantity: "",
+    address: "",
+  };
+  addressChanged = (val) => {
+    this.setState({ address: val });
+  };
+  quantityChanged = (val) => {
+    this.setState({ quantity: val });
+  };
+  render() {
+    return (
+      <div>
+        Welcome to Product Order Screen
+        <hr />
+        <Order quantity={this.state.quantity} oqc={this.quantityChanged} />
+        <hr />
+        <Address address={this.props.address} ac={this.addressChanged} />
+        <hr />
+        <Summary
+          quantity={this.state.quantity}
+          oqc={this.quantityChanged}
+          address={this.state.address}
+        />
+      </div>
+    );
+  }
+}
+class Order extends Component {
+  changeQty = (e) => {
+    this.props.oqc(e.target.value);
+  };
+  render() {
+    return (
+      <div>
+        <p>Product Name</p>
+        <select>
+          <option>Product-1</option>
+          <option>Product-2</option>
+          <option>Product-3</option>
+        </select>
+        <p>
+          Enter Quantity:
+          <input
+            type="text"
+            value={this.props.quantity}
+            onChange={this.changeQty}
+          />
+        </p>
+      </div>
+    );
+  }
 }
 
-class Summary extends Component{
-     changeQty =(e)=>{
-        this.props.oqc(e.target.value)
-    }
-    render(){
-        return(
-            <div>
-                <p>Order Summary </p>
-                 <p>Product Name </p>
-                
-                <p>Update Quantity:
-                    <input type="text" value={this.props.quantity} onChange={this.changeQty} />
-                </p>
-                <p>Address: {this.props.address}</p> 
-            </div>
-        )
-    }
+class Address extends Component {
+  changeAddr = (e) => {
+    this.props.ac(e.target.value);
+  };
+  render() {
+    return (
+      <div>
+        <p>Address Details </p>
+
+        <p>
+          Enter Address:
+          <input
+            type="text"
+            value={this.props.address}
+            onChange={this.changeAddr}
+          />
+        </p>
+        <CustomError>
+          <TempAddress />
+        </CustomError>
+      </div>
+    );
+  }
+}
+
+class TempAddress extends Component {
+  render() {
+    throw new Error("Not able to Load Temp Address...!");
+    return (
+      <div>
+        <p> Temp Address Details </p>
+
+        <p> Pune ,MH 400123:</p>
+      </div>
+    );
+  }
+}
+
+class Summary extends Component {
+  changeQty = (e) => {
+    this.props.oqc(e.target.value);
+  };
+  render() {
+    return (
+      <div>
+        <p>Order Summary </p>
+        <p>Product Name </p>
+
+        <p>
+          Update Quantity:
+          <input
+            type="text"
+            value={this.props.quantity}
+            onChange={this.changeQty}
+          />
+        </p>
+        <p>Address: {this.props.address}</p>
+      </div>
+    );
+  }
 }
