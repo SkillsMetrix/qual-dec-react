@@ -1,0 +1,76 @@
+import { Component } from "react";
+
+
+export default class LSP extends Component{
+
+    state={
+        quantity:"",
+        address:""
+    }
+    addressChanged=(val) => {
+        this.setState({address:val})
+    }
+    quantityChanged=(val) => {
+        this.setState({quantity:val})
+    }
+    render(){
+        return (
+            <div>
+                Welcome to Product Order Screen
+                <hr/>
+<Order/>
+<hr/>
+<Address/>
+<hr/>
+<Summary/>
+            </div>
+        )
+    }
+}
+class Order extends Component{
+    render(){
+        return(
+            <div>
+                <p>Product Name</p>
+                <select>
+                    <option>Product-1</option>
+                    <option>Product-2</option>
+                    <option>Product-3</option>
+                </select>
+                <p>Enter Quantity:
+                    <input type="text" />
+                </p>
+            </div>
+        )
+    }
+}
+
+class Address extends Component{
+    render(){
+        return(
+            <div>
+                <p>Address Details </p>
+              
+                <p>Enter Address:
+                    <input type="text" />
+                </p>
+            </div>
+        )
+    }
+}
+
+class Summary extends Component{
+    render(){
+        return(
+            <div>
+                <p>Order Summary </p>
+                 <p>Product Name </p>
+                
+                <p>Update Quantity:
+                    <input type="text" />
+                </p>
+                <p>Address:</p>
+            </div>
+        )
+    }
+}
