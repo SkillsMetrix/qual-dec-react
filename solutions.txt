@@ -1,136 +1,70 @@
-import { Component } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+function Login(props) {
+  const [uname, setUname] = useState("");
+  const [pass, setPass] = useState("");
+const navigate=useNavigate()
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-class CustomError extends Component {
-  state = {
-    hasError: null,
-  };
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-  render() {
-    if (this.state.hasError) {
-      <div>
-        <p>Unable to Load Address...!</p>
-      </div>;
+    const user = JSON.parse(localStorage.getItem("qual"));
+    if (user && user.uname === uname && user.pass === pass) {
+        localStorage.setItem('loggedin','true')
+     // alert("Login Success");
+      navigate("/userdetails")
     } else {
-      return this.props.children;
+      alert("login failed");
     }
-  }
-}
+  };
 
-export default class LSP extends Component {
-  state = {
-    quantity: "",
-    address: "",
-  };
-  addressChanged = (val) => {
-    this.setState({ address: val });
-  };
-  quantityChanged = (val) => {
-    this.setState({ quantity: val });
-  };
-  render() {
-    return (
-      <div>
-        Welcome to Product Order Screen
-        <hr />
-        <Order quantity={this.state.quantity} oqc={this.quantityChanged} />
-        <hr />
-        <Address address={this.props.address} ac={this.addressChanged} />
-        <hr />
-        <Summary
-          quantity={this.state.quantity}
-          oqc={this.quantityChanged}
-          address={this.state.address}
-        />
+  return (
+    <div>
+      <div class="card">
+        <div class="card-header">User Login Form</div>
+        <div class="card-body">
+          <form onSubmit={handleLogin}>
+            UserName:{" "}
+            <input
+              type="text"
+              value={uname}
+              onChange={(e) => setUname(e.target.value)}
+            />
+            Password:{" "}
+            <input
+              type="password"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+            />
+            <button className="btn btn-primary">Login</button>
+          </form>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
-class Order extends Component {
-  changeQty = (e) => {
-    this.props.oqc(e.target.value);
-  };
-  render() {
+
+export default Login;
+--------
+
+import React, { useEffect, useState } from 'react';
+import Login from './Login';
+
+function UserDetails(props) {
+    const [loggedin,setLoggedin]= useState(false)
+
+    useEffect(()=>{
+        const status=localStorage.getItem("loggedin") ==='true'
+        setLoggedin(status)
+    },[])
     return (
-      <div>
-        <p>Product Name</p>
-        <select>
-          <option>Product-1</option>
-          <option>Product-2</option>
-          <option>Product-3</option>
-        </select>
-        <p>
-          Enter Quantity:
-          <input
-            type="text"
-            value={this.props.quantity}
-            onChange={this.changeQty}
-          />
-        </p>
-      </div>
+        <div>
+            {loggedin ? (
+                <div>UserDetails.........!</div>
+            ):(
+                <Login onLogin={setLoggedin} />
+            )}
+        </div>
     );
-  }
 }
 
-class Address extends Component {
-  changeAddr = (e) => {
-    this.props.ac(e.target.value);
-  };
-  render() {
-    return (
-      <div>
-        <p>Address Details </p>
-
-        <p>
-          Enter Address:
-          <input
-            type="text"
-            value={this.props.address}
-            onChange={this.changeAddr}
-          />
-        </p>
-        <CustomError>
-          <TempAddress />
-        </CustomError>
-      </div>
-    );
-  }
-}
-
-class TempAddress extends Component {
-  render() {
-    throw new Error("Not able to Load Temp Address...!");
-    return (
-      <div>
-        <p> Temp Address Details </p>
-
-        <p> Pune ,MH 400123:</p>
-      </div>
-    );
-  }
-}
-
-class Summary extends Component {
-  changeQty = (e) => {
-    this.props.oqc(e.target.value);
-  };
-  render() {
-    return (
-      <div>
-        <p>Order Summary </p>
-        <p>Product Name </p>
-
-        <p>
-          Update Quantity:
-          <input
-            type="text"
-            value={this.props.quantity}
-            onChange={this.changeQty}
-          />
-        </p>
-        <p>Address: {this.props.address}</p>
-      </div>
-    );
-  }
-}
+export default UserDetails;
