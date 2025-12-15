@@ -1,70 +1,69 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-function Login(props) {
-  const [uname, setUname] = useState("");
-  const [pass, setPass] = useState("");
-const navigate=useNavigate()
-  const handleLogin = (e) => {
-    e.preventDefault();
 
-    const user = JSON.parse(localStorage.getItem("qual"));
-    if (user && user.uname === uname && user.pass === pass) {
-        localStorage.setItem('loggedin','true')
-     // alert("Login Success");
-      navigate("/userdetails")
-    } else {
-      alert("login failed");
+import axios from 'axios'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAPIThunk } from './createAPIThunk';
+import { getPosts } from './postAPI';
+
+export const fetchUsers= createAPIThunk(
+    "posts/fetchposts",
+     getPosts
+)
+export const fetchUsersSlice= createSlice({
+    name:"posts",
+    initialState:{
+        list:[],
+        loading:false,
+        error:null
+    },
+    reducers:{},
+    extraReducers:(builder)=>{
+        builder
+        .addCase(fetchUsers.pending,(state) =>{
+            state.loading= true
+        })
+        .addCase(fetchUsers.fulfilled,(state,action) =>{
+            state.loading=false
+            state.list=action.payload
+        })
     }
-  };
+})
+export default fetchUsersSlice.reducer
 
-  return (
-    <div>
-      <div class="card">
-        <div class="card-header">User Login Form</div>
-        <div class="card-body">
-          <form onSubmit={handleLogin}>
-            UserName:{" "}
-            <input
-              type="text"
-              value={uname}
-              onChange={(e) => setUname(e.target.value)}
-            />
-            Password:{" "}
-            <input
-              type="password"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-            />
-            <button className="btn btn-primary">Login</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+---------
+
+
+import { createAsyncThunk } from "@reduxjs/toolkit"
+
+
+export const createAPIThunk= (type,apiCall) =>{
+
+    createAsyncThunk(type,async(_,{rejectWithValue})=>{
+        try {
+            const response= await apiCall()
+            return response.data
+        }catch(error){
+            return rejectWithValue(error.message)
+        }
+    })
 }
 
-export default Login;
+-----------
+
+
+import appClient from "../apiClient"
+
+
+export const getPosts=()=>{
+    return appClient.get('/users')
+}
+
+
 --------
 
-import React, { useEffect, useState } from 'react';
-import Login from './Login';
+import axios from "axios";
+const appClient= axios.create({
+    baseURL:'https://jsonplaceholder.typicode.com',
+    timeout: 5000
 
-function UserDetails(props) {
-    const [loggedin,setLoggedin]= useState(false)
-
-    useEffect(()=>{
-        const status=localStorage.getItem("loggedin") ==='true'
-        setLoggedin(status)
-    },[])
-    return (
-        <div>
-            {loggedin ? (
-                <div>UserDetails.........!</div>
-            ):(
-                <Login onLogin={setLoggedin} />
-            )}
-        </div>
-    );
-}
-
-export default UserDetails;
+})
+export default appClient
