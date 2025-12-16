@@ -1,70 +1,52 @@
-import axiosInstance from "./axiosInstance";
+import { createSlice } from "@reduxjs/toolkit";
 
-
-export const apiCall =(url)=> axiosInstance.get(url)
-
-
-----
-
-import { createSlice } from '@reduxjs/toolkit'
-
-const apiSlice= createSlice({
-    name: 'api',
-    initialState:{
-        data:[],
-        loading:false
+const apiSlice = createSlice({
+  name: "api",
+  initialState: {
+    data: [],
+    item: null,
+    loading: false,
+  },
+  reducers: {
+   
+    fetchList: (state) => {
+      state.loading = true;
     },
-    reducers:{
-        apiRequest:(state)=>{
-            state.loading= true
-        },
-        apiSuccess:(state,action) =>{
-            state.data=action.payload
-            state.loading=false
-        }
-    }
-})
-export const {apiRequest,apiSuccess}=apiSlice.actions
+    fetchItem: (state) => {
+      state.loading = true;
+    },
+    listSuccess: (state, action) => {
+      state.list = action.payload;
+      state.loading = false;
+    },
+    itemSuccess: (state, action) => {
+      state.item = action.payload;
+      state.loading = false;
+    },
+  },
+});
+export const { fetchItem,fetchList,listSuccess,itemSuccess } = apiSlice.actions;
 export default apiSlice.reducer;
 
-----
 
-import axios from "axios";
-const axiosInstance= axios.create({
-    baseURL:'https://jsonplaceholder.typicode.com',
-    timeout: 5000
 
-})
-export default axiosInstance
 
-----
-
+-------
 import { apiCall } from "./apiService";
-import { apiRequest, apiSuccess } from "./apiSlice";
-import { call, put, takeLatest } from 'redux-saga/effects'
+import {
+  fetchList,fetchItem,listSuccess,itemSuccess
+} from "./apiSlice";
+import { call, put, takeLatest } from "redux-saga/effects";
 
-function* handleApi(action){
-    const response= yield call (apiCall,action.payload)
-    yield put(apiSuccess(response.data))
+function* fetchListSaga(action) {
+  const response = yield call(apiCall, action.payload);
+  yield put(listSuccess(response.data));
 }
-export default function* rootSaga(){
-    yield takeLatest(apiRequest.type,handleApi)
+function* fetchItemSaga(action) {
+  const response = yield call(apiCall, action.payload);
+  yield put(itemSuccess(response.data));
 }
-
-------
-import createSagaMiddleware from 'redux-saga'
-import { configureStore } from '@reduxjs/toolkit'
-import apiReducer from './apiSlice'
-import rootSaga from './sagaApp'
-const sagaMiddleware= createSagaMiddleware()
-
-const store= configureStore({
-    reducer:{
-        api:apiReducer
-    },
-    middleware:(gdm) =>gdm({thunk:false}).concat(sagaMiddleware)
-})
-sagaMiddleware.run(rootSaga)
-
-
-export default store
+export default function* rootSaga() {
+  yield takeLatest(fetchList.type,fetchListSaga);
+  yield takeLatest(fetchItem.type,fetchItemSaga);
+}
