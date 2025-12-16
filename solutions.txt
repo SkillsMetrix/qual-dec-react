@@ -1,69 +1,70 @@
+import axiosInstance from "./axiosInstance";
 
-import axios from 'axios'
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { createAPIThunk } from './createAPIThunk';
-import { getPosts } from './postAPI';
 
-export const fetchUsers= createAPIThunk(
-    "posts/fetchposts",
-     getPosts
-)
-export const fetchUsersSlice= createSlice({
-    name:"posts",
+export const apiCall =(url)=> axiosInstance.get(url)
+
+
+----
+
+import { createSlice } from '@reduxjs/toolkit'
+
+const apiSlice= createSlice({
+    name: 'api',
     initialState:{
-        list:[],
-        loading:false,
-        error:null
+        data:[],
+        loading:false
     },
-    reducers:{},
-    extraReducers:(builder)=>{
-        builder
-        .addCase(fetchUsers.pending,(state) =>{
+    reducers:{
+        apiRequest:(state)=>{
             state.loading= true
-        })
-        .addCase(fetchUsers.fulfilled,(state,action) =>{
+        },
+        apiSuccess:(state,action) =>{
+            state.data=action.payload
             state.loading=false
-            state.list=action.payload
-        })
+        }
     }
 })
-export default fetchUsersSlice.reducer
+export const {apiRequest,apiSuccess}=apiSlice.actions
+export default apiSlice.reducer;
 
----------
-
-
-import { createAsyncThunk } from "@reduxjs/toolkit"
-
-
-export const createAPIThunk= (type,apiCall) =>{
-
-    createAsyncThunk(type,async(_,{rejectWithValue})=>{
-        try {
-            const response= await apiCall()
-            return response.data
-        }catch(error){
-            return rejectWithValue(error.message)
-        }
-    })
-}
-
------------
-
-
-import appClient from "../apiClient"
-
-
-export const getPosts=()=>{
-    return appClient.get('/users')
-}
-
-
---------
+----
 
 import axios from "axios";
-const appClient= axios.create({
+const axiosInstance= axios.create({
     baseURL:'https://jsonplaceholder.typicode.com',
     timeout: 5000
 
 })
-export default appClient
+export default axiosInstance
+
+----
+
+import { apiCall } from "./apiService";
+import { apiRequest, apiSuccess } from "./apiSlice";
+import { call, put, takeLatest } from 'redux-saga/effects'
+
+function* handleApi(action){
+    const response= yield call (apiCall,action.payload)
+    yield put(apiSuccess(response.data))
+}
+export default function* rootSaga(){
+    yield takeLatest(apiRequest.type,handleApi)
+}
+
+------
+import createSagaMiddleware from 'redux-saga'
+import { configureStore } from '@reduxjs/toolkit'
+import apiReducer from './apiSlice'
+import rootSaga from './sagaApp'
+const sagaMiddleware= createSagaMiddleware()
+
+const store= configureStore({
+    reducer:{
+        api:apiReducer
+    },
+    middleware:(gdm) =>gdm({thunk:false}).concat(sagaMiddleware)
+})
+sagaMiddleware.run(rootSaga)
+
+
+export default store
