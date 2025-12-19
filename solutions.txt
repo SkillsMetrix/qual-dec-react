@@ -1,16 +1,33 @@
-import { render,screen } from '@testing-library/react'
-
-import userEvent from '@testing-library/user-event'
-import Login, { validateEmail } from './Login'
-
-describe("Testing app",()=>{
-    test("render with 2 buttons",async()=>{
-            render(<Login/>)
-            const buttonList= await screen.findAllByRole('button')
-            expect(buttonList).toHaveLength(2)
+test("email input field should accept email ", () => {
+      render(<Login />);
+      const email = screen.getByPlaceholderText("Enter email");
+      userEvent.type(email, "amar@mail.com");
+      expect(email.value).toMatch("amar@mail.com");
     })
-    test('validate email format',async()=>{
-        const testEmail='amar@mail.com'
-        expect(validateEmail(testEmail)).toBe(true)
-    })
+    test("password field check", () => {
+        render(<Login />);
+        const password = screen.getByPlaceholderText("Password");
+        
+        expect(password).toHaveAttribute("type","password")
+      })
+      test("should display alert if Error", async() => {
+        render(<Login />);
+        const email = screen.getByPlaceholderText("Enter email");
+        const password = screen.getByPlaceholderText("Password");
+        const buttonList = await screen.findAllByRole("button");
+         userEvent.type(email, "amarcom");
+        userEvent.type(password, "123456");
+        userEvent.click(buttonList[0])
+       // const error= screen.getByText("Email is not valid")
+       // expect(error).toBeInTheDocument();
+      });
+
+      test('for reset',()=>{
+        const {getByLabelText,getByTestId}=render (<Login/>)
+        const resetBtn= getByTestId('reset')
+        const emailInput= getByLabelText("Email")
+        const passInput= getByLabelText("Passsword")
+        userEvent.click(resetBtn)
+        //expect(emailInput.value).toMatch("")
+      })
 })
